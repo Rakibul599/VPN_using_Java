@@ -1,5 +1,5 @@
 import java.util.HashMap;
-
+//this class use for server
 public class ReaderWriterThread implements Runnable{
     NetworkConnection nc;
     String username;
@@ -15,10 +15,13 @@ public class ReaderWriterThread implements Runnable{
 
     @Override
     public void run() {
+        AES aes=new AES();
 
         while (true)
         {
-            String msg=(String)nc.read();
+
+            String enmsg=(String)nc.read(); //Received encrypted message
+            String msg = aes.decrypt(enmsg); //Decrypt the message
             System.out.println(msg);
             String word[]=msg.split("#"); //divided into sender ,receiver and actual message
             /*
@@ -32,16 +35,21 @@ public class ReaderWriterThread implements Runnable{
             {
                 StringBuilder msgToSend = new StringBuilder("List of Clients...\n");
                 for (String clientName : clientlist.keySet()) {
-//                    System.out.println(clientName);
-                    msgToSend.append(clientName).append("\n");
-                }
 
-                nc.write(msgToSend.toString());
+                    msgToSend.append(clientName).append("\n");
+
+                }
+                msgToSend.append("Choose an option:\n");
+                String List=msgToSend.toString();
+                String enlist=aes.encrypt(List);
+                nc.write(enlist);
             }
             Information info=clientlist.get(word[1]);
             if(word[2].toLowerCase().equals("send"))
             {
-               info.nc.write(word[1]+"Says :"+word[3]);
+                String newmsg=(String) word[1]+" Says :"+word[3];
+                String ennewmsg=aes.encrypt(newmsg);
+               info.nc.write(ennewmsg);
             }
 
 

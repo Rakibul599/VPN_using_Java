@@ -9,16 +9,17 @@ public class NetworkConnection {
     ObjectOutputStream oos;
     NetworkConnection(Socket socket) throws IOException
     {
-        this.socket=socket;
+        this.socket=socket; //create socket for server
         this.oos=new ObjectOutputStream(socket.getOutputStream());
         this.ois=new ObjectInputStream(socket.getInputStream());
     }
     NetworkConnection(String ip ,int port) throws IOException
     {
-        socket=new Socket(ip,port);
+        socket=new Socket(ip,port); //create socket for client
         this.oos=new ObjectOutputStream(socket.getOutputStream());
         this.ois=new ObjectInputStream(socket.getInputStream());
     }
+    //write function use server and client both
     void write(String obj)
     {
 
@@ -29,7 +30,8 @@ public class NetworkConnection {
             e.printStackTrace();
             System.out.println("Failed to write");
         }
-    } 
+    }
+    //Read function use server and client both
     public Object read() {
         try {
             return ois.readObject();

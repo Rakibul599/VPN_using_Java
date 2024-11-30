@@ -1,18 +1,20 @@
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 
 public class VpnServer {
     public static void main(String[] args) throws IOException {
-        ServerSocket socket=new ServerSocket(5000);
+        ServerSocket socket=new ServerSocket(5000); //Create server socket
         System.out.println("Vpn server Started...");
-        HashMap<String,Information>clientlist=new HashMap<String,Information>();
+        System.out.println(InetAddress.getLocalHost());
+        HashMap<String,Information>clientlist=new HashMap<String,Information>();  //Store the Client name and Network connection
 
         while (true) {
             Socket sock=socket.accept();
             System.out.println("CLent connectd");
-            NetworkConnection nc=new NetworkConnection(sock);
+            NetworkConnection nc=new NetworkConnection(sock); //create network connection
             new Createconnection(clientlist,nc);
 
         }
@@ -33,11 +35,13 @@ class Createconnection implements Runnable{
 
     @Override
     public void run() {
-        String username=(String) nc.read();
-        System.out.println(username+" connected");
-        clientlist.put(username,new Information(username,nc));
+        String username=(String) nc.read(); //received encrypted message
+        AES aes=new AES(); //
+        String decuname=aes.decrypt(username); //decrypted the Message
+        System.out.println(decuname+" connected");
+        clientlist.put(decuname,new Information(decuname,nc)); //Store the separate Client Information
         System.out.println("Hasmap: "+clientlist);
-        new ReaderWriterThread(nc,username,clientlist);
+        new ReaderWriterThread(nc,decuname,clientlist);
 
     }
 }
